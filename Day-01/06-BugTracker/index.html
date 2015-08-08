@@ -30,11 +30,11 @@
         /*
         Use Cases
         ==========
-        1. List the bugs
-        2. Add a new bug
-        3. Toggle the 'closed' status of a bug
-        4. Remove closed bugs
-        5. Display statistics
+        1. List the bugs - done
+        2. Add a new bug - done
+        3. Toggle the 'closed' status of a bug - don
+        4. Remove closed bugs - done
+        5. Display statistics - done
         6. Search for bugs
         7. Sort the bugs
         8. Display the 'createdAt'
@@ -45,17 +45,57 @@
     <script src="angular.js"></script>
     <script>
         var bugTrackerApp = angular.module("bugTrackerApp", []);
-        bugTrackerApp.controller("bugsController", function($scope){
+
+       /* bugTrackerApp.value("Bug", function Bug(defaults){
+            this.name = defaults.name || '';
+            this.isClosed = defaults.isClosed || false;
+            this.toggle = function(){
+                this.isClosed = !this.isClosed;
+            }
+        });*/
+
+
+        bugTrackerApp.factory("Bug", function($http){
+            console.log("$http - ", $http);
+            function Bug(defaults){
+                this.name = defaults.name || '';
+                this.isClosed = defaults.isClosed || false;
+            }
+            Bug.prototype.toggle = function(){
+                this.isClosed = !this.isClosed;
+            };
+            return Bug;
+        });
+        bugTrackerApp.controller("bugsController", function($scope, Bug){
             $scope.bugs = [
-                "Stack overflow error",
-                "Null reference error",
-                "undefined is not a function",
-                "object reference not set to an instance of an object"
+                 new Bug({name : "Stack overflow error"}),
+                 new Bug({name : "Null reference error"}),
+                 new Bug({name : "undefined is not a function"}),
+                 new Bug({name : "object reference not set to an instance of an object"}),
             ];
-
-
             $scope.addBug = function(newBugName){
-                $scope.bugs.push(newBugName);
+                var newBug = new Bug({
+                    name : newBugName
+                });
+                $scope.bugs.push(newBug);
+            };
+
+            $scope.toggle = function(bug){
+                bug.toggle();
+            };
+
+            $scope.removeClosed = function(){
+                for(var i=$scope.bugs.length-1; i>=0; i--){
+                    var bug = $scope.bugs[i];
+                    if (bug.isClosed)
+                        $scope.bugs.splice(i,1);
+                }
+            };
+
+            $scope.getClosedCount = function(){
+                return $scope.bugs.filter(function(bug){
+                    return bug.isClosed;
+                }).length;
             };
         });
     </script>
@@ -64,7 +104,7 @@
     <h1>Bug Tracker</h1>
     <div class="content" ng-controller="bugsController">
         <div class="stats">
-            <span class="closed">3</span>
+            <span class="closed">{{getClosedCount()}}</span>
             /
             <span>{{bugs.length}}</span>
         </div>
@@ -80,9 +120,9 @@
             <label for="">Bug :</label>
             <input type="text" ng-model="newBug">
             <input type="button" value="Add Bug" ng-click="addBug(newBug)"    >
-            <input type="button" value="Remove Closed">
+            <input type="button" value="Remove Closed" ng-click="removeClosed()">
             <ol>
-                <li ng-repeat="bug in bugs">{{bug}}</li>
+                <li ng-repeat="bug in bugs" ng-click="toggle(bug)" ng-class="{closed : bug.isClosed}">{{bug}}</li>
             </ol>
         </div>
     </div>
