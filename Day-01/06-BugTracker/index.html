@@ -20,10 +20,20 @@
             padding: 4px;
             border-radius: 4px;
             margin: 10px;
-            cursor: pointer;
+
         }
         div{
             margin-bottom: 10px;
+        }
+        div.bugName {
+            margin-bottom: 5px;
+            font-size: 18pt;
+            cursor: pointer;
+        }
+        div.timeStamp{
+            font-style: italic;
+            font-weight: bold;
+            font-size: small;
         }
     </style>
     <script>
@@ -43,6 +53,7 @@
         */
     </script>
     <script src="angular.js"></script>
+    <script src="moment.js"></script>
     <script>
         var bugTrackerApp = angular.module("bugTrackerApp", []);
 
@@ -59,6 +70,7 @@
             function Bug(defaults){
                 this.name = defaults.name || '';
                 this.isClosed = defaults.isClosed || false;
+                this.createdAt = defaults.createdAt || new Date();
             }
             Bug.prototype.toggle = function(){
                 this.isClosed = !this.isClosed;
@@ -67,10 +79,10 @@
         });
         bugTrackerApp.controller("bugsController", function($scope, Bug){
             $scope.bugs = [
-                 new Bug({name : "Stack overflow error"}),
-                 new Bug({name : "Null reference error"}),
-                 new Bug({name : "undefined is not a function"}),
-                 new Bug({name : "object reference not set to an instance of an object"}),
+                 new Bug({name : "Stack overflow error", createdAt : new Date(2015,6,3)}),
+                 new Bug({name : "Null reference error", createdAt : new Date(2015,7,3)}),
+                 new Bug({name : "undefined is not a function", createdAt : new Date(2015,7,5)}),
+                 new Bug({name : "object reference not set to an instance of an object", createdAt : new Date(2015,7,8)}),
             ];
             $scope.addBug = function(newBugName){
                 var newBug = new Bug({
@@ -97,6 +109,14 @@
                 }).length;
             };
         });
+
+        bugTrackerApp.value("momentApi", moment);
+        bugTrackerApp.filter("toMoment", function(momentApi){
+            return function(data){
+                return momentApi(data).fromNow();
+            }
+        });
+
     </script>
 </head>
 <body ng-app="bugTrackerApp">
@@ -126,7 +146,14 @@
             <input type="button" value="Add Bug" ng-click="addBug(newBug)"    >
             <input type="button" value="Remove Closed" ng-click="removeClosed()">
             <ol>
-                <li ng-repeat="bug in bugs | filter:searchBug | orderBy:bugSortBy:bugSortOrder" ng-click="toggle(bug)" ng-class="{closed : bug.isClosed}">{{bug.name}}</li>
+                <li ng-repeat="bug in bugs | filter:searchBug | orderBy:bugSortBy:bugSortOrder">
+                    <div class="bugName" ng-click="toggle(bug)" ng-class="{closed : bug.isClosed}">
+                        {{bug.name}}
+                    </div>
+                    <div class="timeStamp">
+                        {{bug.createdAt | toMoment}}
+                    </div>
+                </li>
             </ol>
         </div>
     </div>
