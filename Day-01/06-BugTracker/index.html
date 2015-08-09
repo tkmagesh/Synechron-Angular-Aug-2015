@@ -35,7 +35,7 @@
         3. Toggle the 'closed' status of a bug - don
         4. Remove closed bugs - done
         5. Display statistics - done
-        6. Search for bugs
+        6. Search for bugs - done
         7. Sort the bugs
         8. Display the 'createdAt'
         9. Persist the bugs in the localStorage
@@ -55,8 +55,7 @@
         });*/
 
 
-        bugTrackerApp.factory("Bug", function($http){
-            console.log("$http - ", $http);
+        bugTrackerApp.factory("Bug", function(){
             function Bug(defaults){
                 this.name = defaults.name || '';
                 this.isClosed = defaults.isClosed || false;
@@ -110,7 +109,10 @@
         </div>
         <div class="search">
             <label for="">Search :</label>
-            <input type="text" >
+            <input type="text" ng-model="searchBug.name" >
+            <label for="">Closed ? :</label>
+            <input type="checkbox" ng-model="searchBug.isClosed">
+            <input type="button" value="Show All" ng-click="searchBug.isClosed = undefined">
         </div>
         <div class="sort">
             <label for="">Order By :</label>
@@ -122,7 +124,7 @@
             <input type="button" value="Add Bug" ng-click="addBug(newBug)"    >
             <input type="button" value="Remove Closed" ng-click="removeClosed()">
             <ol>
-                <li ng-repeat="bug in bugs" ng-click="toggle(bug)" ng-class="{closed : bug.isClosed}">{{bug}}</li>
+                <li ng-repeat="bug in bugs | filter:searchBug" ng-click="toggle(bug)" ng-class="{closed : bug.isClosed}">{{bug.name}}</li>
             </ol>
         </div>
     </div>
