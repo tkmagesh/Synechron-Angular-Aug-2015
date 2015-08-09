@@ -70,6 +70,7 @@
 
         bugTrackerApp.factory("Bug", function(){
             function Bug(defaults){
+                this.id = defaults.id || 0;
                 this.name = defaults.name || '';
                 this.isClosed = defaults.isClosed || false;
                 this.createdAt = defaults.createdAt || new Date();
@@ -79,29 +80,43 @@
             };
             return Bug;
         });
-        bugTrackerApp.controller("bugsController", function($scope, Bug){
-            $scope.bugs = [
-                 new Bug({name : "Stack overflow error", createdAt : new Date(2015,6,3)}),
-                 new Bug({name : "Null reference error", createdAt : new Date(2015,7,3)}),
-                 new Bug({name : "undefined is not a function", createdAt : new Date(2015,7,5)}),
-                 new Bug({name : "object reference not set to an instance of an object", createdAt : new Date(2015,7,8)}),
-            ];
+
+
+        bugTrackerApp.controller("bugsController", function($scope, Bug, $http){
+            $scope.bugs = [];
+
+            var promise = $http.get("/bugs");
+            promise.then(function(response){
+                $scope.bugs = response.data.map(function(bugData){
+                    return new Bug(bugData);
+                });
+            });
+
             $scope.addBug = function(newBugName){
                 var newBug = new Bug({
                     name : newBugName
                 });
-                $scope.bugs.push(newBug);
+                $http.post("/bugs", newBug).then(function(response){
+                    $scope.bugs.push(new Bug(response.data));
+                });
+
             };
 
             $scope.toggle = function(bug){
                 bug.toggle();
+                $http.put("/bugs/" + bug.id, bug);
             };
 
             $scope.removeClosed = function(){
                 for(var i=$scope.bugs.length-1; i>=0; i--){
                     var bug = $scope.bugs[i];
-                    if (bug.isClosed)
-                        $scope.bugs.splice(i,1);
+                    if (bug.isClosed){
+                        (function(index){
+                            $http.delete("/bugs/" + bug.id).then(function(response){
+                                $scope.bugs.splice(index,1);
+                            });
+                        })(i);
+                    }
                 }
             };
 
