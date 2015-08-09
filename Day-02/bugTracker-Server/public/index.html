@@ -112,20 +112,28 @@
         });
 
 
-        bugTrackerApp.factory("bugService", function($http, Bug, $q, testService){
+        bugTrackerApp.provider("bugService", function(){
+            var _baseUrl = 'http://localhost:5555/bugs';
             return {
-                getAll : function(onResult){
-                    var deferred = $q.defer();
+                setBaseUrl : function(url){
+                    _baseUrl = url;
+                },
+                $get : function($http, Bug, $q, testService){
+                    return {
+                        getAll : function(onResult){
+                            var deferred = $q.defer();
 
-                    var promise = $http.get("/bugs");
-                    promise.then(function(response){
-                        var result = response.data.map(function(bugData){
-                            return new Bug(bugData);
-                        });
-                        deferred.resolve(result);
-                    });
+                            var promise = $http.get(_baseUrl);
+                            promise.then(function(response){
+                                var result = response.data.map(function(bugData){
+                                    return new Bug(bugData);
+                                });
+                                deferred.resolve(result);
+                            });
 
-                    return deferred.promise;
+                            return deferred.promise;
+                        }
+                    }
                 }
             }
         });

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <script src="angular.js"></script>
+    <script src="angular-route.js"></script>
+    <script>
+        var routingApp = angular.module("routingApp", ["ngRoute"]);
+        routingApp.config(function($routeProvider){
+            $routeProvider
+                .when("/products", {
+                    //template : "<h2>Products</h2>"
+                    templateUrl : "templates/products.html",
+                    controller : "productsController"
+                })
+                .when("/products/:id", {
+                    templateUrl : "templates/productInfo.html",
+                    controller : "productInfoController"
+                })
+                .when("/customers", {
+                    //template : "<h2>Customers</h2>"
+                templateUrl : "templates/customers.html"
+                })
+                .otherwise({
+                    redirectTo : "/products"
+                });
+        });
+        routingApp.factory("productsService", function(){
+            return {
+                getAll : function(){
+                    return [
+                        {id : 1, name : "Pen", cost : 50, units : 60, desc : "Expetendis anim mentitum do anim senserit hic adipisicing, fabulas dolor quid do quid, ab nulla proident possumus, anim arbitror efflorescere aut cupidatat velit summis qui elit, magna expetendis ut admodum se dolor illustriora probant dolor ingeniis. Quo voluptate sed iudicem non aute tempor ab expetendis, e lorem quid qui mandaremus, cernantur an aute, anim admodum tractavissent, eram est commodo ubi sed de minim singulis, e dolore tempor comprehenderit. Fore quo eu nisi expetendis, fugiat ita pariatur id magna. Eiusmod dolore nisi laboris sint. Ubi "},
+                        {id : 2, name : "Hen", cost : 70, units : 100, desc : "Expetendis anim mentitum do anim senserit hic adipisicing, fabulas dolor quid do quid, ab nulla proident possumus, anim arbitror efflorescere aut cupidatat velit summis qui elit, magna expetendis ut admodum se dolor illustriora probant dolor ingeniis. Quo voluptate sed iudicem non aute tempor ab expetendis, e lorem quid qui mandaremus, cernantur an aute, anim admodum tractavissent, eram est commodo ubi sed de minim singulis, e dolore tempor comprehenderit. Fore quo eu nisi expetendis, fugiat ita pariatur id magna. Eiusmod dolore nisi laboris sint. Ubi "},
+                        {id : 3, name : "Ten", cost : 10, units : 10, desc : "Expetendis anim mentitum do anim senserit hic adipisicing, fabulas dolor quid do quid, ab nulla proident possumus, anim arbitror efflorescere aut cupidatat velit summis qui elit, magna expetendis ut admodum se dolor illustriora probant dolor ingeniis. Quo voluptate sed iudicem non aute tempor ab expetendis, e lorem quid qui mandaremus, cernantur an aute, anim admodum tractavissent, eram est commodo ubi sed de minim singulis, e dolore tempor comprehenderit. Fore quo eu nisi expetendis, fugiat ita pariatur id magna. Eiusmod dolore nisi laboris sint. Ubi "},
+                        {id : 4, name : "Den", cost : 100, units : 10, desc : "Expetendis anim mentitum do anim senserit hic adipisicing, fabulas dolor quid do quid, ab nulla proident possumus, anim arbitror efflorescere aut cupidatat velit summis qui elit, magna expetendis ut admodum se dolor illustriora probant dolor ingeniis. Quo voluptate sed iudicem non aute tempor ab expetendis, e lorem quid qui mandaremus, cernantur an aute, anim admodum tractavissent, eram est commodo ubi sed de minim singulis, e dolore tempor comprehenderit. Fore quo eu nisi expetendis, fugiat ita pariatur id magna. Eiusmod dolore nisi laboris sint. Ubi "}
+                    ]
+                }
+            }
+
+        });
+        routingApp.controller("productsController", function($scope, productsService){
+            $scope.products = productsService.getAll();
+        });
+        routingApp.controller("productInfoController", function($scope, productsService, $routeParams){
+            var productId = parseInt($routeParams.id);
+            $scope.product = productsService.getAll().filter(function(product){
+                return product.id === productId;
+            })[0];
+        });
+    </script>
+</head>
+<body ng-app="routingApp">
+    <h1>FlopKart</h1>
+    <hr>
+    <a href="#/products">Products</a>
+    <a href="#/customers">Customers</a>
+    <div ng-view></div>
+</body>
+</html>
