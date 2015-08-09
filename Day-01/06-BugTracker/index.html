@@ -116,7 +116,9 @@
         </div>
         <div class="sort">
             <label for="">Order By :</label>
-            <input type="text" >
+            <input type="text" ng-model="bugSortBy">
+            <label for="">Descending ? :</label>
+            <input type="checkbox" ng-model="bugSortOrder">
         </div>
         <div class="list">
             <label for="">Bug :</label>
@@ -124,7 +126,7 @@
             <input type="button" value="Add Bug" ng-click="addBug(newBug)"    >
             <input type="button" value="Remove Closed" ng-click="removeClosed()">
             <ol>
-                <li ng-repeat="bug in bugs | filter:searchBug" ng-click="toggle(bug)" ng-class="{closed : bug.isClosed}">{{bug.name}}</li>
+                <li ng-repeat="bug in bugs | filter:searchBug | orderBy:bugSortBy:bugSortOrder" ng-click="toggle(bug)" ng-class="{closed : bug.isClosed}">{{bug.name}}</li>
             </ol>
         </div>
     </div>
