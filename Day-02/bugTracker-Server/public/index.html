@@ -81,8 +81,38 @@
             return Bug;
         });
 
+        bugTrackerApp.provider("testService", function(){
+            console.log("outer factory is invoked [before 'run']");
+            var _msg = "Hi there";
+            return {
+                setGreetMsg : function(msg){
+                    _msg = msg;
+                },
+                $get : function($http){
+                    console.log("inner factory is invoked [after 'config']");
+                    return {
+                        now : function(){
+                            return new Date();
+                        },
+                        greet : function(){
+                            return _msg;
+                        }
+                    }
+                }
+            }
+        });
 
-        bugTrackerApp.factory("bugService", function($http, Bug, $q){
+        bugTrackerApp.config(function(testServiceProvider){
+            console.log("config invoked");
+            testServiceProvider.setGreetMsg("Hello there! Have a nice day!");
+        });
+        bugTrackerApp.run(function(testService){
+            console.log("run invoked");
+            console.log(testService.greet());
+        });
+
+
+        bugTrackerApp.factory("bugService", function($http, Bug, $q, testService){
             return {
                 getAll : function(onResult){
                     var deferred = $q.defer();
